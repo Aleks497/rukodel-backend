@@ -1,0 +1,40 @@
+{% extends 'shop/base.html' %}
+{% block content %}
+<div class="container my-5">
+    <h2 class="fw-bold mb-4"><i class="fas fa-receipt me-2" style="color:#764ba2"></i>Оформление заказа</h2>
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card p-4">
+                <h5 class="fw-bold mb-3">Данные доставки</h5>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Адрес доставки *</label>
+                        <textarea name="address" class="form-control" rows="3" placeholder="Город, улица, дом, квартира" required></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Комментарий к заказу</label>
+                        <textarea name="comment" class="form-control" rows="2" placeholder="Позвоните перед доставкой..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-purple w-100 btn-lg">Подтвердить заказ</button>
+                </form>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="card p-4">
+                <h5 class="fw-bold mb-3">Ваш заказ</h5>
+                {% for item in items %}
+                <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
+                    <span>{{ item.product.name }} <small class="text-muted">× {{ item.quantity }}</small></span>
+                    <span class="fw-semibold">{{ item.subtotal|floatformat:0 }} ₽</span>
+                </div>
+                {% endfor %}
+                <div class="d-flex justify-content-between mt-3">
+                    <span class="fw-bold fs-5">Итого:</span>
+                    <span class="fw-bold fs-5" style="color:#764ba2">{{ total|floatformat:0 }} ₽</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Документация ИС «РукоДел»</title>
+  <style>
+    body{font-family:Calibri,Arial,sans-serif; font-size:12pt; line-height:1.35; color:#111;}
+    h1{font-size:20pt; margin:0 0 10px 0;}
+    h2{font-size:16pt; margin:18px 0 8px;}
+    h3{font-size:13pt; margin:14px 0 6px;}
+    .muted{color:#555;}
+    .meta{margin:0 0 14px 0;}
+    .box{border:1px solid #ddd; padding:10px 12px; border-radius:6px; margin:10px 0;}
+    table{border-collapse:collapse; width:100%; margin:8px 0 12px;}
+    th,td{border:1px solid #ddd; padding:8px; vertical-align:top;}
+    th{background:#f5f5f5; text-align:left;}
+    code, pre{font-family:Consolas, "Courier New", monospace; font-size:10.5pt;}
+    pre{background:#0f172a; color:#e5e7eb; padding:10px 12px; border-radius:6px; overflow:auto;}
+    .pagebreak{page-break-before:always;}
+    ul{margin:6px 0 10px 20px;}
+    ol{margin:6px 0 10px 20px;}
+    .toc a{text-decoration:none; color:#111;}
+  </style>
+</head>
+<body>
+
+  <h1>Документация информационной системы предприятия по продаже ручных изделий «РукоДел»</h1>
+  <p class="meta"><b>Версия:</b> 1.0 &nbsp;&nbsp; <b>Дата:</b> 2025-12-24 &nbsp;&nbsp; <b>Формат системы:</b> одностраничное web‑приложение (frontend‑демо) с целевой моделью MySQL</p>
+  <div class="box">
+    <p class="muted" style="margin:0;">Примечание: текущая демо‑реализация хранит пользователей и корзину в <code>localStorage</code>. Раздел «MySQL» описывает целевую схему и примеры запросов для серверной версии.</p>
+  </div>
+
+  <h2>Оглавление</h2>
+  <ol class="toc">
+    <li><a href="#sec1">Общее описание системы</a></li>
+    <li><a href="#sec2">Технические требования</a></li>
+    <li><a href="#sec3">Архитектура системы</a></li>
+    <li><a href="#shots">Приложение A — Скриншоты интерфейса</a></li>
+  </ol>
+
+  <div class="pagebreak"></div>
+
+  <h2 id="sec1">1. Общее описание системы</h2>
+
+  <h3>1.1 Название и назначение</h3>
+  <p><b>ИС «РукоДел»</b> — информационная система предприятия (интернет‑витрина) по продаже изделий ручной работы от разных мастеров. Система предоставляет интерфейс для регистрации/входа пользователей, просмотра каталога, выбора товаров, управления корзиной и оформления заказов.</p>
+
+  <h3>1.2 Целевая аудитория пользователей</h3>
+  <ul>
+    <li><b>Покупатели</b> — выбирают товары, добавляют в корзину, оформляют заказ.</li>
+    <li><b>Мастера (продавцы)</b> — размещают ассортимент/представляют товары (в демо роль фиксируется при регистрации).</li>
+    <li><b>Администратор</b> — управляет контентом и заказами (в целевой версии; UI админки в демо не реализован).</li>
+  </ul>
+
+  <h3>1.3 Основные бизнес‑цели</h3>
+  <ul>
+    <li>Организовать онлайн‑канал продаж изделий ручной работы.</li>
+    <li>Сформировать единый каталог изделий от разных мастеров и повысить прозрачность ассортимента (цена/остаток).</li>
+    <li>Сократить время обработки заказов за счёт корзины и автоматического расчёта итоговой суммы.</li>
+    <li>Подготовить основу для масштабирования до клиент‑серверной версии с хранением данных в MySQL.</li>
+  </ul>
+
+  <h3>1.4 Ключевые функциональные возможности (кратко)</h3>
+  <table>
+    <tr><th>Функция</th><th>Описание</th></tr>
+    <tr><td>Регистрация</td><td>Создание учётной записи (имя, email, пароль, роль: покупатель/мастер).</td></tr>
+    <tr><td>Вход/выход</td><td>Аутентификация по email и паролю, выход из аккаунта.</td></tr>
+    <tr><td>Каталог</td><td>Просмотр списка изделий; отображение цены и остатка; привязка товара к мастеру.</td></tr>
+    <tr><td>Фильтрация</td><td>Фильтр по категориям (например: керамика/текстиль/украшения/дерево).</td></tr>
+    <tr><td>Корзина</td><td>Добавление/удаление товара, изменение количества, подсчёт итога.</td></tr>
+    <tr><td>Оформление заказа</td><td>В демо — эмуляция оформления (очистка корзины + уведомление). В целевой версии — запись заказа в MySQL.</td></tr>
+  </table>
+
+  <div class="pagebreak"></div>
+
+  <h2 id="sec2">2. Технические требования</h2>
+
+  <h3>2.1 Требования к программному обеспечению</h3>
+  <table>
+    <tr><th>Компонент</th><th>Минимальные требования</th></tr>
+    <tr>
+      <td>Клиент (демо)</td>
+      <td>
+        <ul>
+          <li>Браузер: Chrome/Edge/Firefox актуальных версий (поддержка ES6+).</li>
+          <li>ОС: Windows 10+, macOS 12+, Linux (современные дистрибутивы).</li>
+          <li>Фреймворки/библиотеки (CDN): Tailwind CSS, Font Awesome, Google Fonts.</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td>Серверная версия (рекомендуемо)</td>
+      <td>
+        <ul>
+          <li>Backend: Node.js 18+ (Express) <i>или</i> PHP 8.2+.</li>
+          <li>API: REST/JSON (Auth, Catalog, Cart/Orders).</li>
+          <li>Безопасность: HTTPS, хэширование паролей (bcrypt/argon2), защита от SQL‑инъекций (prepared statements).</li>
+        </ul>
+      </td>
+    </tr>
+  </table>
+
+  <h3>2.2 Требования к оборудованию</h3>
+  <table>
+    <tr><th>Среда</th><th>Минимум</th><th>Рекомендуемо</th></tr>
+    <tr>
+      <td>Клиент</td>
+      <td>CPU 2 ядра, RAM 4 GB, экран от 360px по ширине, доступ к интернету (для CDN).</td>
+      <td>CPU 4 ядра, RAM 8 GB, стабильный интернет.</td>
+    </tr>
+    <tr>
+      <td>Сервер (API + MySQL)</td>
+      <td>CPU 2–4 ядра, RAM 4–8 GB, SSD 20 GB, HTTPS (443).</td>
+      <td>CPU 4–8 ядер, RAM 16 GB, SSD 50+ GB, резервное копирование.</td>
+    </tr>
+  </table>
+
+  <h3>2.3 Требования к базе данных</h3>
+  <ul>
+    <li>СУБД: <b>MySQL 8.0+</b> (или MariaDB 10.5+).</li>
+    <li>Кодировка: <code>utf8mb4</code>, collation: <code>utf8mb4_unicode_ci</code>.</li>
+    <li>Обязательные сущности: users, masters, products, orders, order_items.</li>
+    <li>Резервное копирование: ежедневный <code>mysqldump</code> + хранение копий не менее 7 дней (рекомендуемо).</li>
+  </ul>
+
+  <h3>2.4 Необходимые зависимости</h3>
+  <table>
+    <tr><th>Тип</th><th>Зависимости</th></tr>
+    <tr>
+      <td>Программные</td>
+      <td>
+        <ul>
+          <li>Tailwind CSS (CDN) для UI.</li>
+          <li>Font Awesome (CDN) для иконок.</li>
+          <li>Google Fonts (CDN) для шрифтов.</li>
+          <li>Для server‑side: mysql2/pdo_mysql, bcrypt/argon2, cors (если требуется).</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td>Системные</td>
+      <td>
+        <ul>
+          <li>HTTPS‑сертификат (Let’s Encrypt или корпоративный CA).</li>
+          <li>Логи и мониторинг (по возможности).</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td>Сетевые</td>
+      <td>
+        <ul>
+          <li>Доступ к CDN (если зависимости не скачаны локально).</li>
+          <li>Открытые порты: 443 (HTTPS), 3306 (MySQL — только внутри сети/через VPN, рекомендовано закрыть наружу).</li>
+        </ul>
+      </td>
+    </tr>
+  </table>
+
+  <h3>2.5 Примеры команд (подготовка MySQL)</h3>
+  <pre>-- MySQL: создание БД и пользователя
+CREATE DATABASE rukodel CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+CREATE USER 'rukodel_app'@'%' IDENTIFIED BY 'StrongPasswordHere!';
+GRANT SELECT, INSERT, UPDATE, DELETE ON rukodel.* TO 'rukodel_app'@'%';
+FLUSH PRIVILEGES;</pre>
+
+  <div class="pagebreak"></div>
+
+  <h2 id="sec3">3. Архитектура системы</h2>
+
+  <h3>3.1 Схема взаимодействия компонентов</h3>
+  <p>Текущая демо‑версия — <b>frontend‑only</b>. Целевая версия — <b>frontend + backend API + MySQL</b>.</p>
+  <pre>[Пользователь]
+     |
+     v
+[Браузер: UI (HTML + Tailwind) + JS]
+     |
+     | A) Демо: localStorage
+     v
+[localStorage: users / currentUser / cart]
+
+     | B) Целевая версия: HTTPS запросы
+     v
+[Backend API (Node.js/Express или PHP)]  <-->  [MySQL 8.0+]
+     |
+     v
+[Бизнес-логика: auth, products, orders]</pre>
+
+  <h3>3.2 Основные модули и назначение</h3>
+  <table>
+    <tr><th>Модуль</th><th>Назначение</th><th>Пример (функции/элементы)</th></tr>
+    <tr><td>UI / Навигация</td><td>Отображение разделов сайта, модальные окна, адаптивность.</td><td>Header/Nav, секции Catalog/Masters/About, модальные окна</td></tr>
+    <tr><td>Auth</td><td>Регистрация, вход, выход, переключение состояния интерфейса.</td><td><code>handleRegister</code>, <code>handleLogin</code>, <code>logout</code>, <code>updateAuthUI</code></td></tr>
+    <tr><td>Каталог</td><td>Рендер товаров, фильтрация по категориям, отображение мастера.</td><td><code>renderProducts</code>, <code>filterProducts</code></td></tr>
+    <tr><td>Мастера</td><td>Профили мастеров, рейтинг, количество товаров.</td><td><code>renderMasters</code></td></tr>
+    <tr><td>Корзина</td><td>Добавление/удаление/изменение количества, расчёт суммы.</td><td><code>addToCart</code>, <code>renderCart</code>, <code>checkout</code></td></tr>
+    <tr><td>Уведомления</td><td>Сообщения об успехе/ошибках для пользователя.</td><td><code>showNotification</code></td></tr>
+  </table>
+
+  <h3>3.3 Принципы работы с данными</h3>
+  <p><b>Демо‑режим (frontend):</b></p>
+  <ul>
+    <li>Справочники «мастера» и «товары» заданы массивами JS: <code>masters</code>, <code>products</code>.</li>
+    <li>Пользователи, текущая сессия и корзина сохраняются в <code>localStorage</code>.</li>
+  </ul>
+
+  <pre>// Ключи localStorage
+users        // массив зарегистрированных пользователей
+currentUser  // текущая сессия
+cart         // массив { productId, quantity }
+
+// Пример чтения/записи
+const users = JSON.parse(localStorage.getItem('users') || '[]');
+localStorage.setItem('users', JSON.stringify(users));</pre>
+
+  <p><b>Целевая версия (с MySQL):</b></p>
+  <ul>
+    <li>Все сущности хранятся в таблицах MySQL; доступ осуществляется через API.</li>
+    <li>Пароли в БД не хранятся в открытом виде — только хэш (bcrypt/argon2).</li>
+    <li>Заказы состоят из «шапки» (orders) и строк (order_items).</li>
+  </ul>
+
+  <h3>3.4 Пример целевой SQL‑схемы (укорочено)</h3>
+  <pre>CREATE TABLE users (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(100) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  role ENUM('buyer','master') DEFAULT 'buyer',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE masters (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT,
+  specialty VARCHAR(100),
+  description TEXT,
+  avatar VARCHAR(255),
+  rating DECIMAL(2,1),
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE products (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  master_id INT,
+  name VARCHAR(200) NOT NULL,
+  description TEXT,
+  price DECIMAL(10,2) NOT NULL,
+  quantity INT DEFAULT 0,
+  category VARCHAR(50),
+  image VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (master_id) REFERENCES masters(id)
+);</pre>
+
+  <h3>3.5 Примеры SQL‑запросов (MySQL)</h3>
+  <pre>-- Получить товары с именем мастера
+SELECT p.id, p.name, p.price, p.quantity, p.category,
+       m.id AS master_id, u.name AS master_name
+FROM products p
+JOIN masters m ON m.id = p.master_id
+JOIN users u ON u.id = m.user_id
+WHERE p.quantity > 0
+ORDER BY p.created_at DESC;
+
+-- Создать заказ
+INSERT INTO orders (user_id, total_price, status)
+VALUES (123, 8900.00, 'pending');
+
+-- Добавить позиции заказа
+INSERT INTO order_items (order_id, product_id, quantity, price)
+VALUES (LAST_INSERT_ID(), 7, 1, 4500.00);</pre>
+
+  <h3>3.6 Пример команд запуска (если добавлять сервер)</h3>
+  <pre># Node.js (пример)
+npm init -y
+npm i express mysql2 bcrypt cors
+node server.js
+
+# Применить схему
+mysql -u rukodel_app -p rukodel -e "source schema.sql"</pre>
+
+  <div class="pagebreak"></div>
+
+  <h2 id="shots">Приложение A — Скриншоты интерфейса</h2>
+  <p class="muted">Вставьте скриншоты из работающего сайта. Ниже — список рекомендуемых экранов и что на них должно быть видно.</p>
+
+  <table>
+    <tr><th>№</th><th>Экран</th><th>Что показать на скриншоте</th><th>Место для вставки</th></tr>
+    <tr>
+      <td>1</td>
+      <td>Каталог и фильтры</td>
+      <td>Кнопки категорий, карточки товаров, цена, остаток, кнопка «в корзину».</td>
+      <td>Вставить изображение здесь (Word: Вставка → Рисунки).</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Модальное окно входа</td>
+      <td>Поля Email/Пароль и кнопка «Войти».</td>
+      <td>Вставить изображение здесь.</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Корзина</td>
+      <td>Список позиций, кнопки изменения количества, итоговая сумма.</td>
+      <td>Вставить изображение здесь.</td>
+    </tr>
+  </table>
+
+  <div class="box">
+    <p style="margin:0;"><b>Как сделать скриншот:</b> откройте нужный экран → нажмите <b>Win+Shift+S</b> (Windows) или <b>Cmd+Shift+4</b> (macOS) → вставьте в Word (Ctrl+V/Cmd+V).</p>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>РукоДел | Магазин ручных изделий</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap');
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        h1, h2, h3, .logo {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .modal-overlay {
+            backdrop-filter: blur(5px);
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .craft-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+<body class="bg-amber-50 craft-pattern min-h-screen">
+    <!-- Навигация -->
+    <nav class="bg-white shadow-lg sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <i class="fas fa-hand-holding-heart text-purple-600 text-2xl mr-2"></i>
+                    <span class="logo text-2xl font-bold text-purple-800">РукоДел</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#catalog" class="text-gray-700 hover:text-purple-600 transition">Каталог</a>
+                    <a href="#masters" class="text-gray-700 hover:text-purple-600 transition">Мастера</a>
+                    <a href="#about" class="text-gray-700 hover:text-purple-600 transition">О нас</a>
+                </div>
+                <div id="authButtons" class="flex items-center space-x-4">
+                    <button onclick="openHealthCheck()" class="hidden sm:inline-flex text-gray-500 hover:text-purple-700 transition" title="Проверка загрузки и хранилища">
+                        <i class="fas fa-stethoscope mr-2"></i>Проверка
+                    </button>
+                    <button onclick="openModal('login')" class="text-purple-600 hover:text-purple-800 font-medium transition">
+                        Вход
+                    </button>
+                    <button onclick="openModal('register')" class="bg-purple-600 text-white px-4 py-2 rounded-full hover:bg-purple-700 transition">
+                        Регистрация
+                    </button>
+                </div>
+                <div id="userPanel" class="hidden items-center space-x-4">
+                    <span class="text-gray-700">Привет, <span id="userName" class="font-semibold text-purple-600"></span>!</span>
+                    <button onclick="viewCart()" class="relative text-purple-600 hover:text-purple-800">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                        <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
+                    </button>
+                    <button onclick="logout()" class="text-gray-500 hover:text-red-500 transition">
+                        <i class="fas fa-sign-out-alt text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Главный баннер -->
+    <header class="gradient-bg text-white py-20">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h1 class="text-5xl md:text-6xl font-bold mb-6">РукоДел</h1>
+            <p class="text-xl md:text-2xl mb-8 opacity-90">Уникальные изделия ручной работы от лучших мастеров</p>
+            <div class="flex justify-center space-x-4">
+                <a href="#catalog" class="bg-white text-purple-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition">
+                    Смотреть каталог
+                </a>
+                <button onclick="openModal('register')" class="border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-purple-600 transition">
+                    Стать мастером
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Статистика -->
+    <section class="py-12 bg-white">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div>
+                    <div class="text-4xl font-bold text-purple-600">150+</div>
+                    <div class="text-gray-600">Мастеров</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold text-purple-600">2000+</div>
+                    <div class="text-gray-600">Изделий</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold text-purple-600">5000+</div>
+                    <div class="text-gray-600">Покупателей</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold text-purple-600">98%</div>
+                    <div class="text-gray-600">Довольных клиентов</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Каталог товаров -->
+    <section id="catalog" class="py-16">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center text-gray-800 mb-4">Каталог изделий</h2>
+            <p class="text-center text-gray-600 mb-12">Каждое изделие создано с любовью и вниманием к деталям</p>
+            
+            <!-- Фильтры -->
+            <div class="flex flex-wrap justify-center gap-4 mb-10">
+                <button onclick="filterProducts('all')" class="filter-btn active px-6 py-2 rounded-full bg-purple-600 text-white hover:bg-purple-700 transition" data-filter="all">
+                    Все товары
+                </button>
+                <button onclick="filterProducts('керамика')" class="filter-btn px-6 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-purple-600 hover:text-white transition" data-filter="керамика">
+                    Керамика
+                </button>
+                <button onclick="filterProducts('текстиль')" class="filter-btn px-6 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-purple-600 hover:text-white transition" data-filter="текстиль">
+                    Текстиль
+                </button>
+                <button onclick="filterProducts('украшения')" class="filter-btn px-6 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-purple-600 hover:text-white transition" data-filter="украшения">
+                    Украшения
+                </button>
+                <button onclick="filterProducts('дерево')" class="filter-btn px-6 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-purple-600 hover:text-white transition" data-filter="дерево">
+                    Изделия из дерева
+                </button>
+            </div>
+
+            <!-- Сетка товаров -->
+            <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                <!-- Товары будут добавлены через JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Мастера -->
+    <section id="masters" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center text-gray-800 mb-4">Наши мастера</h2>
+            <p class="text-center text-gray-600 mb-12">Талантливые люди, создающие уникальные изделия</p>
+            
+            <div id="mastersGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Мастера будут добавлены через JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- О нас -->
+    <section id="about" class="py-16 gradient-bg text-white">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h2 class="text-4xl font-bold mb-6">О предприятии «РукоДел»</h2>
+            <p class="text-lg mb-8 opacity-90">
+                Мы объединяем талантливых мастеров со всей России, чтобы вы могли приобрести уникальные изделия ручной работы. 
+                Каждый товар в нашем магазине — это результат кропотливого труда и безграничной любви к своему делу. 
+                Поддержите отечественных мастеров — выбирайте изделия с душой!
+            </p>
+            <div class="flex justify-center space-x-6">
+                <a href="#" class="text-white hover:text-purple-200 transition"><i class="fab fa-vk text-3xl"></i></a>
+                <a href="#" class="text-white hover:text-purple-200 transition"><i class="fab fa-telegram text-3xl"></i></a>
+                <a href="#" class="text-white hover:text-purple-200 transition"><i class="fab fa-instagram text-3xl"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Футер -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-hand-holding-heart text-purple-400 text-2xl mr-2"></i>
+                        <span class="logo text-2xl font-bold">РукоДел</span>
+                    </div>
+                    <p class="text-gray-400">Уникальные изделия ручной работы от лучших мастеров России</p>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">Контакты</h3>
+                    <p class="text-gray-400"><i class="fas fa-phone mr-2"></i>+7 (800) 123-45-67</p>
+                    <p class="text-gray-400"><i class="fas fa-envelope mr-2"></i>info@rukodel.ru</p>
+                    <p class="text-gray-400"><i class="fas fa-map-marker-alt mr-2"></i>Москва, ул. Мастеров, 1</p>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">Режим работы</h3>
+                    <p class="text-gray-400">Пн-Пт: 9:00 - 20:00</p>
+                    <p class="text-gray-400">Сб-Вс: 10:00 - 18:00</p>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>© 2024 РукоДел. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Модальное окно входа -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 modal-overlay">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 relative">
+            <button onclick="closeModal('login')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Вход в аккаунт</h2>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Email</label>
+                    <input type="email" id="loginEmail" required 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="example@mail.ru">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 mb-2">Пароль</label>
+                    <input type="password" id="loginPassword" required 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="••••••••">
+                </div>
+                <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition">
+                    Войти
+                </button>
+            </form>
+            <p class="text-center text-gray-600 mt-4">
+                Нет аккаунта? <a href="#" onclick="switchModal('login', 'register')" class="text-purple-600 hover:underline">Зарегистрироваться</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Модальное окно регистрации -->
+    <div id="registerModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 modal-overlay">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('register')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Регистрация</h2>
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Имя</label>
+                    <input type="text" id="regName" required 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="Ваше имя">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Email</label>
+                    <input type="email" id="regEmail" required 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="example@mail.ru">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Пароль</label>
+                    <input type="password" id="regPassword" required minlength="6"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="Минимум 6 символов">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 mb-2">Тип аккаунта</label>
+                    <select id="regRole" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <option value="buyer">Покупатель</option>
+                        <option value="master">Мастер (продавец)</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition">
+                    Зарегистрироваться
+                </button>
+            </form>
+            <p class="text-center text-gray-600 mt-4">
+                Уже есть аккаунт? <a href="#" onclick="switchModal('register', 'login')" class="text-purple-600 hover:underline">Войти</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Модальное окно корзины -->
+    <div id="cartModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 modal-overlay">
+        <div class="bg-white rounded-2xl p-8 max-w-2xl w-full mx-4 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('cart')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">
+                <i class="fas fa-shopping-cart mr-2"></i>Корзина
+            </h2>
+            <div id="cartItems" class="space-y-4">
+                <!-- Товары корзины будут добавлены через JavaScript -->
+            </div>
+            <div id="cartEmpty" class="text-center text-gray-500 py-8 hidden">
+                <i class="fas fa-shopping-basket text-5xl mb-4"></i>
+                <p>Ваша корзина пуста</p>
+            </div>
+            <div id="cartTotal" class="border-t mt-6 pt-6">
+                <div class="flex justify-between text-xl font-bold">
+                    <span>Итого:</span>
+                    <span id="totalPrice" class="text-purple-600">0 ₽</span>
+                </div>
+                <button onclick="checkout()" class="w-full mt-4 bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition">
+                    Оформить заказ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Уведомление -->
+    <div id="notification" class="fixed top-20 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50">
+        <span id="notificationText"></span>
+    </div>
+
+    <!-- Модальное окно проверки работоспособности -->
+    <div id="healthModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 modal-overlay">
+        <div class="bg-white rounded-2xl p-6 max-w-2xl w-full mx-4 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeHealthCheck()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2"><i class="fas fa-stethoscope mr-2 text-purple-600"></i>Проверка работы сайта</h2>
+            <p class="text-gray-600 mb-4 text-sm">Если «сайт не работает», эта проверка поможет быстро понять причину (CDN, localStorage, ошибки JS).</p>
+
+            <div class="flex flex-wrap gap-3 mb-4">
+                <button onclick="runHealthCheck()" class="bg-purple-600 text-white px-4 py-2 rounded-full hover:bg-purple-700 transition">
+                    Запустить проверку
+                </button>
+                <button onclick="copyHealthReport()" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-full hover:bg-gray-200 transition">
+                    Скопировать отчёт
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="rounded-xl border border-gray-100 p-4">
+                    <div class="font-semibold text-gray-800 mb-2">Статус</div>
+                    <ul id="healthList" class="space-y-2 text-sm"></ul>
+                </div>
+                <div class="rounded-xl border border-gray-100 p-4">
+                    <div class="font-semibold text-gray-800 mb-2">Частые причины и решения</div>
+                    <ul class="text-sm text-gray-600 list-disc pl-5 space-y-2">
+                        <li><span class="font-semibold">Нет интернета / блокировка CDN</span>: Tailwind/иконки/шрифты могут не загрузиться. Попробуйте другой интернет или скачайте зависимости локально.</li>
+                        <li><span class="font-semibold">Открытие как файл (file://)</span>: в некоторых браузерах часть функций может ограничиваться. Лучше открыть через локальный сервер.</li>
+                        <li><span class="font-semibold">Запрещён localStorage</span>: режим инкогнито/политики/расширения могут блокировать. Разрешите хранение данных.</li>
+                        <li><span class="font-semibold">Ошибки JS</span>: посмотрите консоль (F12 → Console) или скопируйте отчёт ниже.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-4 rounded-xl bg-gray-900 text-gray-100 p-4">
+                <div class="text-xs text-gray-300 mb-2">Технический отчёт</div>
+                <pre id="healthReport" class="text-xs overflow-auto whitespace-pre-wrap"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== ЭМУЛЯЦИЯ БАЗЫ ДАННЫХ (MySQL структура) ====================
+        /*
+        SQL схема базы данных:
+
+        CREATE TABLE users (
+            id INT PRIMARY KEY AUTO_INCREMENT,
+            name VARCHAR(100) NOT NULL,
+            email VARCHAR(100) UNIQUE NOT NULL,
+            password VARCHAR(255) NOT NULL,
+            role ENUM('buyer', 'master') DEFAULT 'buyer',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE masters (
+            id INT PRIMARY KEY AUTO_INCREMENT,
+            user_id INT,
+            specialty VARCHAR(100),
+            description TEXT,
+            avatar VARCHAR(255),
+            rating DECIMAL(2,1),
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        );
+
+        CREATE TABLE products (
+            id INT PRIMARY KEY AUTO_INCREMENT,
+            master_id INT,
+            name VARCHAR(200) NOT NULL,
+            description TEXT,
+            price DECIMAL(10,2) NOT NULL,
+            quantity INT DEFAULT 0,
+            category VARCHAR(50),
+            image VARCHAR(255),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (master_id) REFERENCES masters(id)
+        );
+
+        CREATE TABLE orders (
+            id INT PRIMARY KEY AUTO_INCREMENT,
+            user_id INT,
+            total_price DECIMAL(10,2),
+            status ENUM('pending', 'processing', 'shipped', 'delivered') DEFAULT 'pending',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        );
+
+        CREATE TABLE order_items (
+            id INT PRIMARY KEY AUTO_INCREMENT,
+            order_id INT,
+            product_id INT,
+            quantity INT,
+            price DECIMAL(10,2),
+            FOREIGN KEY (order_id) REFERENCES orders(id),
+            FOREIGN KEY (product_id) REFERENCES products(id)
+        );
+        */
+
+        // Инициализация данных
+        const masters = [
+            { id: 1, name: "Анна Мастерова", specialty: "Керамика", description: "Создаю уникальную керамику уже 10 лет", avatar: "https://randomuser.me/api/portraits/women/44.jpg", rating: 4.9 },
+            { id: 2, name: "Михаил Древесный", specialty: "Изделия из дерева", description: "Резьба по дереву - моя страсть", avatar: "https://randomuser.me/api/portraits/men/32.jpg", rating: 4.8 },
+            { id: 3, name: "Елена Ткачева", specialty: "Текстиль", description: "Вышивка и текстильные изделия ручной работы", avatar: "https://randomuser.me/api/portraits/women/68.jpg", rating: 5.0 },
+            { id: 4, name: "Ольга Ювелирная", specialty: "Украшения", description: "Авторские украшения из серебра и камней", avatar: "https://randomuser.me/api/portraits/women/89.jpg", rating: 4.7 }
+        ];
+
+        const products = [
+            { id: 1, masterId: 1, name: "Керамическая ваза 'Весна'", description: "Ручная роспись, высота 25см", price: 3500, quantity: 5, category: "керамика", image: "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=400" },
+            { id: 2, masterId: 1, name: "Чайный набор 'Традиция'", description: "Чайник и 4 чашки с блюдцами", price: 5800, quantity: 3, category: "керамика", image: "https://images.unsplash.com/photo-1563826904577-6b72c5d75e53?w=400" },
+            { id: 3, masterId: 2, name: "Деревянная шкатулка", description: "Резьба по дереву, орех", price: 2800, quantity: 8, category: "дерево", image: "https://images.unsplash.com/photo-1601628828688-632f38a5a7d0?w=400" },
+            { id: 4, masterId: 2, name: "Разделочная доска 'Эко'", description: "Дуб, ручная обработка", price: 1900, quantity: 12, category: "дерево", image: "https://images.unsplash.com/photo-1594226801341-41427b4e5c22?w=400" },
+            { id: 5, masterId: 3, name: "Вышитая скатерть", description: "Лён, ручная вышивка, 150x200см", price: 7500, quantity: 2, category: "текстиль", image: "https://images.unsplash.com/photo-1558171813-4c088753af8f?w=400" },
+            { id: 6, masterId: 3, name: "Декоративная подушка", description: "Хлопок, авторский принт", price: 2200, quantity: 15, category: "текстиль", image: "https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=400" },
+            { id: 7, masterId: 4, name: "Серебряные серьги 'Листья'", description: "Серебро 925 пробы, аметист", price: 4500, quantity: 6, category: "украшения", image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400" },
+            { id: 8, masterId: 4, name: "Браслет 'Морская волна'", description: "Серебро, бирюза натуральная", price: 3200, quantity: 4, category: "украшения", image: "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=400" },
+            { id: 9, masterId: 1, name: "Тарелка декоративная", description: "Авторская роспись, диаметр 30см", price: 2400, quantity: 7, category: "керамика", image: "https://images.unsplash.com/photo-1610701596061-2ecf227e85b2?w=400" },
+            { id: 10, masterId: 2, name: "Настенные часы 'Природа'", description: "Массив дуба, бесшумный механизм", price: 4200, quantity: 3, category: "дерево", image: "https://images.unsplash.com/photo-1563861826100-9cb868fdbe1c?w=400" },
+            { id: 11, masterId: 3, name: "Сумка-шоппер", description: "Джут, макраме плетение", price: 1800, quantity: 10, category: "текстиль", image: "https://images.unsplash.com/photo-1597633125097-5a9ae21375e2?w=400" },
+            { id: 12, masterId: 4, name: "Кулон 'Сердце'", description: "Серебро, гранат", price: 2900, quantity: 8, category: "украшения", image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400" }
+        ];
+
+        // Инициализация localStorage
+        if (!localStorage.getItem('users')) {
+            localStorage.setItem('users', JSON.stringify([]));
+        }
+        if (!localStorage.getItem('cart')) {
+            localStorage.setItem('cart', JSON.stringify([]));
+        }
+
+        // ==================== ФУНКЦИИ АВТОРИЗАЦИИ ====================
+        
+        function openModal(type) {
+            document.getElementById(type + 'Modal').classList.remove('hidden');
+            document.getElementById(type + 'Modal').classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(type) {
+            document.getElementById(type + 'Modal').classList.add('hidden');
+            document.getElementById(type + 'Modal').classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
+        function switchModal(from, to) {
+            closeModal(from);
+            setTimeout(() => openModal(to), 200);
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const role = document.getElementById('regRole').value;
+
+            const users = JSON.parse(localStorage.getItem('users'));
+            
+            if (users.find(u => u.email === email)) {
+                showNotification('Пользователь с таким email уже существует!', 'error');
+                return;
+            }
+
+            const newUser = {
+                id: Date.now(),
+                name,
+                email,
+                password,
+                role,
+                createdAt: new Date().toISOString()
+            };
+
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            showNotification('Регистрация успешна! Теперь войдите в аккаунт.');
+            closeModal('register');
+            document.getElementById('registerForm').reset();
+            setTimeout(() => openModal('login'), 300);
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            const users = JSON.parse(localStorage.getItem('users'));
+            const user = users.find(u => u.email === email && u.password === password);
+
+            if (user) {
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                closeModal('login');
+                updateAuthUI();
+                showNotification(`Добро пожаловать, ${user.name}!`);
+                document.getElementById('loginForm').reset();
+            } else {
+                showNotification('Неверный email или пароль!', 'error');
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            localStorage.setItem('cart', JSON.stringify([]));
+            updateAuthUI();
+            showNotification('Вы вышли из аккаунта');
+        }
+
+        function updateAuthUI() {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            const authButtons = document.getElementById('authButtons');
+            const userPanel = document.getElementById('userPanel');
+            const userName = document.getElementById('userName');
+
+            if (user) {
+                authButtons.classList.add('hidden');
+                userPanel.classList.remove('hidden');
+                userPanel.classList.add('flex');
+                userName.textContent = user.name;
+                updateCartCount();
+            } else {
+                authButtons.classList.remove('hidden');
+                userPanel.classList.add('hidden');
+                userPanel.classList.remove('flex');
+            }
+        }
+
+        // ==================== ФУНКЦИИ КОРЗИНЫ ====================
+
+        function addToCart(productId) {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if (!user) {
+                showNotification('Войдите в аккаунт для добавления в корзину', 'error');
+                openModal('login');
+                return;
+            }
+
+            const product = products.find(p => p.id === productId);
+            if (!product || product.quantity === 0) {
+                showNotification('Товар недоступен', 'error');
+                return;
+            }
+
+            let cart = JSON.parse(localStorage.getItem('cart'));
+            const existingItem = cart.find(item => item.productId === productId);
+
+            if (existingItem) {
+                if (existingItem.quantity < product.quantity) {
+                    existingItem.quantity++;
+                } else {
+                    showNotification('Достигнуто максимальное количество', 'error');
+                    return;
+                }
+            } else {
+                cart.push({ productId, quantity: 1 });
+            }
+
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            showNotification('Товар добавлен в корзину!');
+        }
+
+        function removeFromCart(productId) {
+            let cart = JSON.parse(localStorage.getItem('cart'));
+            cart = cart.filter(item => item.productId !== productId);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            renderCart();
+        }
+
+        function updateCartItemQuantity(productId, change) {
+            let cart = JSON.parse(localStorage.getItem('cart'));
+            const item = cart.find(i => i.productId === productId);
+            const product = products.find(p => p.id === productId);
+
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    cart = cart.filter(i => i.productId !== productId);
+                } else if (item.quantity > product.quantity) {
+                    item.quantity = product.quantity;
+                    showNotification('Достигнуто максимальное количество', 'error');
+                }
+            }
+
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            renderCart();
+        }
+
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart'));
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const cartCountEl = document.getElementById('cartCount');
+            
+            if (count > 0) {
+                cartCountEl.textContent = count;
+                cartCountEl.classList.remove('hidden');
+            } else {
+                cartCountEl.classList.add('hidden');
+            }
+        }
+
+        function viewCart() {
+            renderCart();
+            openModal('cart');
+        }
+
+        function renderCart() {
+            const cart = JSON.parse(localStorage.getItem('cart'));
+            const cartItemsEl = document.getElementById('cartItems');
+            const cartEmptyEl = document.getElementById('cartEmpty');
+            const cartTotalEl = document.getElementById('cartTotal');
+
+            if (cart.length === 0) {
+                cartItemsEl.innerHTML = '';
+                cartEmptyEl.classList.remove('hidden');
+                cartTotalEl.classList.add('hidden');
+                return;
+            }
+
+            cartEmptyEl.classList.add('hidden');
+            cartTotalEl.classList.remove('hidden');
+
+            let total = 0;
+            cartItemsEl.innerHTML = cart.map(item => {
+                const product = products.find(p => p.id === item.productId);
+                const master = masters.find(m => m.id === product.masterId);
+                const itemTotal = product.price * item.quantity;
+                total += itemTotal;
+
+                return `
+                    <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                        <img src="${product.image}" alt="${product.name}" class="w-20 h-20 object-cover rounded-lg">
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-gray-800">${product.name}</h4>
+                            <p class="text-sm text-gray-500">Мастер: ${master.name}</p>
+                            <p class="text-purple-600 font-bold">${product.price.toLocaleString()} ₽</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="updateCartItemQuantity(${product.id}, -1)" class="w-8 h-8 bg-gray-200 rounded-full hover:bg-gray-300 transition">-</button>
+                            <span class="w-8 text-center font-semibold">${item.quantity}</span>
+                            <button onclick="updateCartItemQuantity(${product.id}, 1)" class="w-8 h-8 bg-gray-200 rounded-full hover:bg-gray-300 transition">+</button>
+                        </div>
+                        <button onclick="removeFromCart(${product.id})" class="text-red-500 hover:text-red-700 transition">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('totalPrice').textContent = total.toLocaleString() + ' ₽';
+        }
+
+        function checkout() {
+            const cart = JSON.parse(localStorage.getItem('cart'));
+            if (cart.length === 0) {
+                showNotification('Корзина пуста!', 'error');
+                return;
+            }
+
+            // Эмуляция оформления заказа
+            localStorage.setItem('cart', JSON.stringify([]));
+            updateCartCount();
+            closeModal('cart');
+            showNotification('Заказ успешно оформлен! Спасибо за покупку!');
+        }
+
+        // ==================== ФУНКЦИИ ОТОБРАЖЕНИЯ ====================
+
+        function renderProducts(filter = 'all') {
+            const grid = document.getElementById('productsGrid');
+            const filteredProducts = filter === 'all' 
+                ? products 
+                : products.filter(p => p.category === filter);
+
+            grid.innerHTML = filteredProducts.map(product => {
+                const master = masters.find(m => m.id === product.masterId);
+                const isAvailable = product.quantity > 0;
+                
+                return `
+                    <div class="product-card bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl" data-category="${product.category}">
+                        <div class="relative">
+                            <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-cover">
+                            ${!isAvailable ? '<div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center"><span class="text-white font-bold text-lg">Нет в наличии</span></div>' : ''}
+                            <span class="absolute top-3 left-3 bg-purple-600 text-white text-xs px-3 py-1 rounded-full">${product.category}</span>
+                        </div>
+                        <div class="p-5">
+                            <h3 class="font-semibold text-lg text-gray-800 mb-2">${product.name}</h3>
+                            <p class="text-gray-500 text-sm mb-3">${product.description}</p>
+                            <div class="flex items-center mb-3">
+                                <img src="${master.avatar}" alt="${master.name}" class="w-8 h-8 rounded-full mr-2">
+                                <span class="text-sm text-gray-600">${master.name}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="text-2xl font-bold text-purple-600">${product.price.toLocaleString()} ₽</span>
+                                    <p class="text-xs text-gray-400">В наличии: ${product.quantity} шт.</p>
+                                </div>
+                                <button onclick="addToCart(${product.id})" 
+                                    class="bg-purple-600 text-white p-3 rounded-full hover:bg-purple-700 transition ${!isAvailable ? 'opacity-50 cursor-not-allowed' : ''}"
+                                    ${!isAvailable ? 'disabled' : ''}>
+                                    <i class="fas fa-cart-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterProducts(category) {
+            // Обновление активной кнопки фильтра
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.dataset.filter === category) {
+                    btn.classList.add('bg-purple-600', 'text-white');
+                    btn.classList.remove('bg-gray-200', 'text-gray-700');
+                } else {
+                    btn.classList.remove('bg-purple-600', 'text-white');
+                    btn.classList.add('bg-gray-200', 'text-gray-700');
+                }
+            });
+
+            renderProducts(category);
+        }
+
+        function renderMasters() {
+            const grid = document.getElementById('mastersGrid');
+            
+            grid.innerHTML = masters.map(master => {
+                const masterProducts = products.filter(p => p.masterId === master.id);
+                
+                return `
+                    <div class="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition">
+                        <img src="${master.avatar}" alt="${master.name}" class="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-purple-100">
+                        <h3 class="font-semibold text-xl text-gray-800 mb-1">${master.name}</h3>
+                        <p class="text-purple-600 font-medium mb-2">${master.specialty}</p>
+                        <p class="text-gray-500 text-sm mb-4">${master.description}</p>
+                        <div class="flex justify-center items-center gap-4 text-sm">
+                            <div class="flex items-center text-yellow-500">
+                                <i class="fas fa-star mr-1"></i>
+                                <span class="text-gray-700">${master.rating}</span>
+                            </div>
+                            <div class="text-gray-500">
+                                <i class="fas fa-box mr-1"></i>
+                                ${masterProducts.length} товаров
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            notification.className = `fixed top-20 right-4 px-6 py-3 rounded-lg shadow-lg transform transition-transform duration-300 z-50 ${type === 'error' ? 'bg-red-500' : 'bg-green-500'} text-white`;
+            notificationText.textContent = message;
+            notification.classList.remove('translate-x-full');
+            
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+            }, 3000);
+        }
+
+        // ==================== ДИАГНОСТИКА (если «не работает») ====================
+
+        let lastGlobalError = null;
+
+        window.addEventListener('error', (event) => {
+            try {
+                lastGlobalError = {
+                    message: event.message,
+                    filename: event.filename,
+                    lineno: event.lineno,
+                    colno: event.colno
+                };
+            } catch (_) {}
+        });
+
+        function openHealthCheck() {
+            const modal = document.getElementById('healthModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+            runHealthCheck();
+        }
+
+        function closeHealthCheck() {
+            const modal = document.getElementById('healthModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
+        function safeTestLocalStorage() {
+            try {
+                const k = '__rukodel_test__';
+                localStorage.setItem(k, '1');
+                localStorage.removeItem(k);
+                return { ok: true };
+            } catch (e) {
+                return { ok: false, error: String(e) };
+            }
+        }
+
+        function hasTailwind() {
+            // В CDN-версии tailwind добавляет множество CSS переменных и классов,
+            // но надёжнее проверять наличие объекта tailwind не получится.
+            // Проверим наличие применённых утилит по computed style.
+            const el = document.createElement('div');
+            el.className = 'hidden';
+            document.body.appendChild(el);
+            const display = getComputedStyle(el).display;
+            el.remove();
+            return display === 'none';
+        }
+
+        function hasFontAwesome() {
+            // Проверяем, загружены ли FA шрифты: по наличию правила .fa
+            // и/или по наличию document.styleSheets с URL font-awesome.
+            try {
+                return Array.from(document.styleSheets).some(ss => (ss.href || '').includes('font-awesome'));
+            } catch (_) {
+                // styleSheets может быть ограничен CORS — тогда fallback на наличие элемента с классом fa.
+                return !!document.querySelector('.fas, .fa, .fab');
+            }
+        }
+
+        function runHealthCheck() {
+            const list = document.getElementById('healthList');
+            const report = document.getElementById('healthReport');
+
+            const ls = safeTestLocalStorage();
+            const protocol = location.protocol;
+            const tailwindOk = hasTailwind();
+            const faOk = hasFontAwesome();
+            const productsGridOk = !!document.getElementById('productsGrid');
+            const mastersGridOk = !!document.getElementById('mastersGrid');
+
+            const items = [
+                { label: 'Протокол открытия', ok: protocol !== 'file:', value: protocol, hint: protocol === 'file:' ? 'Рекомендуется открыть через локальный сервер (например, VS Code Live Server).' : 'OK' },
+                { label: 'localStorage доступен', ok: ls.ok, value: ls.ok ? 'OK' : ls.error, hint: ls.ok ? 'OK' : 'Разрешите хранилище/отключите блокирующие расширения/выйдите из строгого инкогнито.' },
+                { label: 'Tailwind CSS (CDN)', ok: tailwindOk, value: tailwindOk ? 'OK' : 'Не обнаружен', hint: tailwindOk ? 'OK' : 'Проверьте интернет/блокировку CDN.' },
+                { label: 'Font Awesome (иконки)', ok: faOk, value: faOk ? 'OK' : 'Не обнаружен', hint: faOk ? 'OK' : 'Иконки могут не отображаться при блокировке CDN.' },
+                { label: 'Сетка каталога (DOM)', ok: productsGridOk, value: productsGridOk ? 'OK' : 'Нет элемента #productsGrid', hint: productsGridOk ? 'OK' : 'Повреждена разметка index.html.' },
+                { label: 'Сетка мастеров (DOM)', ok: mastersGridOk, value: mastersGridOk ? 'OK' : 'Нет элемента #mastersGrid', hint: mastersGridOk ? 'OK' : 'Повреждена разметка index.html.' },
+                { label: 'Последняя JS-ошибка', ok: !lastGlobalError, value: lastGlobalError ? `${lastGlobalError.message} (${lastGlobalError.filename}:${lastGlobalError.lineno})` : 'Нет', hint: lastGlobalError ? 'Откройте F12 → Console для деталей.' : 'OK' }
+            ];
+
+            list.innerHTML = items.map(i => {
+                const color = i.ok ? 'text-green-600' : 'text-red-600';
+                const icon = i.ok ? 'fa-check-circle' : 'fa-times-circle';
+                return `
+                    <li class="flex items-start gap-3">
+                        <i class="fas ${icon} ${color} mt-1"></i>
+                        <div>
+                            <div class="font-semibold text-gray-800">${i.label}</div>
+                            <div class="text-gray-600"><span class="${color} font-semibold">${i.value}</span></div>
+                            <div class="text-xs text-gray-500">${i.hint}</div>
+                        </div>
+                    </li>
+                `;
+            }).join('');
+
+            const reportObj = {
+                time: new Date().toISOString(),
+                location: String(location.href),
+                protocol,
+                userAgent: navigator.userAgent,
+                localStorage: ls,
+                tailwindDetected: tailwindOk,
+                fontAwesomeDetected: faOk,
+                dom: { productsGridOk, mastersGridOk },
+                lastGlobalError,
+                currentUserPresent: !!localStorage.getItem('currentUser'),
+                usersCount: (() => {
+                    try { return JSON.parse(localStorage.getItem('users') || '[]').length; } catch { return null; }
+                })(),
+                cartCount: (() => {
+                    try { return JSON.parse(localStorage.getItem('cart') || '[]').length; } catch { return null; }
+                })()
+            };
+
+            report.textContent = JSON.stringify(reportObj, null, 2);
+        }
+
+        function copyHealthReport() {
+            const text = document.getElementById('healthReport').textContent || '';
+            if (!text) return;
+            navigator.clipboard?.writeText(text)
+                .then(() => showNotification('Отчёт скопирован в буфер обмена'))
+                .catch(() => {
+                    // fallback
+                    const ta = document.createElement('textarea');
+                    ta.value = text;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    ta.remove();
+                    showNotification('Отчёт скопирован');
+                });
+        }
+
+        // ==================== ИНИЦИАЛИЗАЦИЯ ====================
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProducts();
+            renderMasters();
+            updateAuthUI();
+        });
+
+        // Закрытие модальных окон при клике вне их
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    // корректно закрываем по типу
+                    if (modal.id === 'healthModal') {
+                        closeHealthCheck();
+                        return;
+                    }
+                    if (modal.id === 'loginModal') return closeModal('login');
+                    if (modal.id === 'registerModal') return closeModal('register');
+                    if (modal.id === 'cartModal') return closeModal('cart');
+
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

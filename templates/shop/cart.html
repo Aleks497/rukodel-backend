@@ -1,0 +1,55 @@
+{% extends 'shop/base.html' %}
+{% block content %}
+<div class="container my-5">
+    <h2 class="fw-bold mb-4"><i class="fas fa-shopping-cart me-2" style="color:#764ba2"></i>Корзина</h2>
+
+    {% if items %}
+    <div class="row g-4">
+        <div class="col-lg-8">
+            {% for item in items %}
+            <div class="card mb-3 p-3">
+                <div class="d-flex align-items-center gap-3">
+                    {% if item.product.image %}
+                        <img src="{{ item.product.image.url }}" width="90" height="90" style="object-fit:cover;border-radius:12px" alt="">
+                    {% else %}
+                        <div style="width:90px;height:90px;background:#e9d5ff;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+                            <i class="fas fa-image fa-2x text-white"></i>
+                        </div>
+                    {% endif %}
+                    <div class="flex-grow-1">
+                        <h6 class="fw-bold mb-1">{{ item.product.name }}</h6>
+                        <small class="text-muted">Мастер: {{ item.product.master.user.get_full_name|default:item.product.master.user.username }}</small>
+                        <div class="mt-1">
+                            <span style="color:#764ba2;font-weight:700">{{ item.product.price|floatformat:0 }} ₽</span>
+                            <span class="text-muted ms-2">× {{ item.quantity }} = <b>{{ item.subtotal|floatformat:0 }} ₽</b></span>
+                        </div>
+                    </div>
+                    <a href="/cart/remove/{{ item.id }}/" class="btn btn-outline-danger btn-sm">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card p-4 sticky-top" style="top:80px">
+                <h5 class="fw-bold mb-3">Итого</h5>
+                <div class="d-flex justify-content-between mb-3">
+                    <span>Сумма заказа:</span>
+                    <span class="fw-bold fs-5" style="color:#764ba2">{{ total|floatformat:0 }} ₽</span>
+                </div>
+                <a href="/checkout/" class="btn btn-purple w-100 btn-lg">Оформить заказ</a>
+                <a href="/" class="btn btn-outline-secondary w-100 mt-2">Продолжить покупки</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-5 text-muted">
+        <i class="fas fa-shopping-basket fa-4x mb-3"></i>
+        <h5>Корзина пуста</h5>
+        <a href="/" class="btn btn-purple mt-3">В каталог</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends 'shop/base.html' %}
+{% block content %}
+<div class="container my-5">
+    <a href="/" class="btn btn-outline-secondary btn-sm mb-4">
+        <i class="fas fa-arrow-left me-1"></i>Назад в каталог
+    </a>
+    <div class="row g-5">
+        <div class="col-md-5">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" class="img-fluid rounded-4 shadow" alt="{{ product.name }}">
+            {% else %}
+                <div class="rounded-4 shadow d-flex align-items-center justify-content-center" style="height:350px;background:#e9d5ff;">
+                    <i class="fas fa-image fa-5x text-white"></i>
+                </div>
+            {% endif %}
+        </div>
+        <div class="col-md-7">
+            {% if product.category %}
+                <span class="badge" style="background:#764ba2">{{ product.category.name }}</span>
+            {% endif %}
+            <h2 class="fw-bold mt-2 mb-3">{{ product.name }}</h2>
+            <p class="text-muted">{{ product.description }}</p>
+
+            <div class="d-flex align-items-center mb-3">
+                {% if product.master.avatar %}
+                    <img src="{{ product.master.avatar.url }}" width="40" height="40" class="rounded-circle me-2" style="object-fit:cover">
+                {% endif %}
+                <div>
+                    <div class="fw-semibold">{{ product.master.user.get_full_name|default:product.master.user.username }}</div>
+                    <small class="text-muted">{{ product.master.specialty }}</small>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <span class="display-6 fw-bold" style="color:#764ba2">{{ product.price|floatformat:0 }} ₽</span>
+                <br><small class="text-muted">В наличии: {{ product.quantity }} шт.</small>
+            </div>
+
+            {% if product.in_stock %}
+                <a href="/cart/add/{{ product.id }}/" class="btn btn-purple btn-lg px-4">
+                    <i class="fas fa-cart-plus me-2"></i>В корзину
+                </a>
+            {% else %}
+                <span class="btn btn-secondary btn-lg" disabled>Нет в наличии</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ОТЗЫВЫ -->
+    <div class="mt-5">
+        <h4 class="fw-bold mb-4">Отзывы ({{ reviews.count }})</h4>
+        {% if user.is_authenticated %}
+        <div class="card p-4 mb-4">
+            <h6 class="fw-bold mb-3">Оставить отзыв</h6>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Оценка</label>
+                    <select name="rating" class="form-select">
+                        <option value="5">⭐⭐⭐⭐⭐ — Отлично</option>
+                        <option value="4">⭐⭐⭐⭐ — Хорошо</option>
+                        <option value="3">⭐⭐⭐ — Нормально</option>
+                        <option value="2">⭐⭐ — Плохо</option>
+                        <option value="1">⭐ — Ужасно</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Комментарий</label>
+                    <textarea name="comment" class="form-control" rows="3" placeholder="Ваш отзыв..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-purple">Отправить отзыв</button>
+            </form>
+        </div>
+        {% endif %}
+
+        {% for review in reviews %}
+        <div class="card mb-3 p-3">
+            <div class="d-flex justify-content-between">
+                <span class="fw-semibold">{{ review.user.get_full_name|default:review.user.username }}</span>
+                <span class="text-warning">{% for i in "12345" %}{% if forloop.counter <= review.rating %}⭐{% endif %}{% endfor %}</span>
+            </div>
+            <p class="text-muted mt-2 mb-0">{{ review.comment }}</p>
+            <small class="text-muted">{{ review.created_at|date:"d.m.Y" }}</small>
+        </div>
+        {% empty %}
+        <p class="text-muted">Отзывов пока нет. Будьте первым!</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,146 @@
+{% extends 'shop/base.html' %}
+{% block content %}
+
+<!-- HERO -->
+<div style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:70px 0 50px;">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold mb-3">РукоДел</h1>
+        <p class="lead mb-4">Уникальные изделия ручной работы от лучших мастеров</p>
+        <a href="#catalog" class="btn btn-light btn-lg px-4 me-2">Смотреть каталог</a>
+        <a href="/register/" class="btn btn-outline-light btn-lg px-4">Стать мастером</a>
+    </div>
+</div>
+
+<!-- СТАТИСТИКА -->
+<div class="bg-white py-4 shadow-sm">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-6 col-md-3"><h3 class="fw-bold" style="color:#764ba2">150+</h3><small class="text-muted">Мастеров</small></div>
+            <div class="col-6 col-md-3"><h3 class="fw-bold" style="color:#764ba2">2000+</h3><small class="text-muted">Изделий</small></div>
+            <div class="col-6 col-md-3"><h3 class="fw-bold" style="color:#764ba2">5000+</h3><small class="text-muted">Покупателей</small></div>
+            <div class="col-6 col-md-3"><h3 class="fw-bold" style="color:#764ba2">98%</h3><small class="text-muted">Довольных клиентов</small></div>
+        </div>
+    </div>
+</div>
+
+<!-- КАТАЛОГ -->
+<div id="catalog" class="container my-5">
+    <h2 class="fw-bold text-center mb-2">Каталог изделий</h2>
+    <p class="text-center text-muted mb-4">Каждое изделие создано с любовью и вниманием к деталям</p>
+
+    <!-- ПОИСК И ФИЛЬТРЫ -->
+    <form method="get" class="mb-4">
+        <div class="row g-2 justify-content-center">
+            <div class="col-md-5">
+                <input type="text" name="search" class="form-control" placeholder="Поиск..." value="{{ search }}">
+            </div>
+            <div class="col-md-3">
+                <select name="category" class="form-select" onchange="this.form.submit()">
+                    <option value="">Все категории</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.slug }}" {% if selected_cat == cat.slug %}selected{% endif %}>
+                            {{ cat.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-purple w-100">Найти</button>
+            </div>
+            {% if selected_cat or search %}
+            <div class="col-md-1">
+                <a href="/" class="btn btn-outline-secondary w-100">✕</a>
+            </div>
+            {% endif %}
+        </div>
+    </form>
+
+    <!-- ТОВАРЫ -->
+    <div class="row g-4">
+        {% for product in products %}
+        <div class="col-sm-6 col-lg-4 col-xl-3">
+            <div class="card h-100">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" class="card-img-top" style="height:200px;object-fit:cover;border-radius:16px 16px 0 0" alt="{{ product.name }}">
+                {% else %}
+                    <div style="height:200px;background:#e9d5ff;border-radius:16px 16px 0 0;display:flex;align-items:center;justify-content:center;">
+                        <i class="fas fa-image fa-3x text-white"></i>
+                    </div>
+                {% endif %}
+                <div class="card-body d-flex flex-column">
+                    {% if product.category %}
+                        <span class="badge badge-cat mb-2">{{ product.category.name }}</span>
+                    {% endif %}
+                    <h6 class="card-title fw-bold">
+                        <a href="/product/{{ product.id }}/" class="text-dark text-decoration-none">{{ product.name }}</a>
+                    </h6>
+                    <p class="card-text text-muted small flex-grow-1">{{ product.description|truncatewords:12 }}</p>
+                    <div class="d-flex align-items-center mb-2">
+                        {% if product.master.avatar %}
+                            <img src="{{ product.master.avatar.url }}" class="rounded-circle me-2" width="28" height="28" style="object-fit:cover" alt="">
+                        {% else %}
+                            <div class="rounded-circle me-2 d-flex align-items-center justify-content-center" style="width:28px;height:28px;background:#764ba2">
+                                <i class="fas fa-user fa-xs text-white"></i>
+                            </div>
+                        {% endif %}
+                        <small class="text-muted">{{ product.master.user.get_full_name|default:product.master.user.username }}</small>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-auto">
+                        <div>
+                            <div class="price">{{ product.price|floatformat:0 }} ₽</div>
+                            <small class="text-muted">В наличии: {{ product.quantity }} шт.</small>
+                        </div>
+                        {% if product.in_stock %}
+                            <a href="/cart/add/{{ product.id }}/" class="btn btn-purple btn-sm">
+                                <i class="fas fa-cart-plus"></i>
+                            </a>
+                        {% else %}
+                            <span class="badge bg-secondary">Нет</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5 text-muted">
+            <i class="fas fa-box-open fa-3x mb-3"></i>
+            <p>Товаров не найдено</p>
+            <a href="/" class="btn btn-purple">Сбросить фильтр</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- МАСТЕРА -->
+<div id="masters" class="bg-white py-5">
+    <div class="container">
+        <h2 class="fw-bold text-center mb-2">Наши мастера</h2>
+        <p class="text-center text-muted mb-4">Талантливые люди, создающие уникальные изделия</p>
+        <div class="row g-4">
+            {% for master in masters %}
+            <div class="col-sm-6 col-lg-3">
+                <div class="card text-center p-4 h-100">
+                    {% if master.avatar %}
+                        <img src="{{ master.avatar.url }}" class="rounded-circle mx-auto mb-3" width="90" height="90" style="object-fit:cover;border:4px solid #e9d5ff">
+                    {% else %}
+                        <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width:90px;height:90px;background:#764ba2;border:4px solid #e9d5ff">
+                            <i class="fas fa-user fa-2x text-white"></i>
+                        </div>
+                    {% endif %}
+                    <h6 class="fw-bold">{{ master.user.get_full_name|default:master.user.username }}</h6>
+                    <p class="text-purple fw-semibold small" style="color:#764ba2">{{ master.specialty }}</p>
+                    <p class="text-muted small">{{ master.description|truncatewords:10 }}</p>
+                    <div class="d-flex justify-content-center gap-3 mt-auto">
+                        <span class="text-warning"><i class="fas fa-star"></i> {{ master.rating }}</span>
+                        <span class="text-muted"><i class="fas fa-box"></i> {{ master.products.count }} товаров</span>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center text-muted">Мастеров пока нет</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
